@@ -1,23 +1,20 @@
 module Main exposing (main)
 
 import Array exposing (Array)
+import Array.Extra as AE
 import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (onClick)
 
 
 
 -- Constant
 
 
-columnNum : Int
-columnNum =
-    100
-
-
-rowNum : Int
-rowNum =
-    100
+size : Int
+size =
+    50
 
 
 main : Program () Model Msg
@@ -36,46 +33,71 @@ main =
 type LifeAndDeath
     = Life
     | Death
+    | None
+
+
+flip : LifeAndDeath -> LifeAndDeath
+flip lad =
+    case lad of
+        Life ->
+            Death
+
+        Death ->
+            Life
+
+        None ->
+            None
 
 
 type alias Model =
     Array (Array LifeAndDeath)
 
 
+type alias Point =
+    ( Int, Int )
+
+
 init : Model
 init =
-    Array.repeat rowNum <| Array.repeat columnNum Death
+    Array.initialize size <| always (Array.initialize size (always Death))
 
 
 type Msg
-    = Click
+    = Click Point
+
+
+click : Point -> Model -> Model
+click ( ri, ci ) model =
+    AE.update ri (AE.update ci flip) model
 
 
 update : Msg -> Model -> Model
 update msg model =
-    model
+    case msg of
+        Click p ->
+            click p model
 
 
 view : Model -> Html Msg
 view model =
-    table []
+    table [ style "border-collapse" "collapse" ]
         [ tbody [] (body model) ]
 
 
 body : Model -> List (Html Msg)
 body model =
-    Array.toList <| Array.map row model
+    Array.toList <| Array.indexedMap row model
 
 
-row : Array LifeAndDeath -> Html Msg
-row lads =
-    tr [] (Array.toList <| Array.map cell lads)
+row : Int -> Array LifeAndDeath -> Html Msg
+row rindex lads =
+    tr [] (Array.toList <| Array.indexedMap (cell rindex) lads)
 
 
-cell : LifeAndDeath -> Html Msg
-cell lad =
+cell : Int -> Int -> LifeAndDeath -> Html Msg
+cell rindex cindex lad =
     td
-        (cellStyle lad)
+        (onClick (Click ( rindex, cindex )) :: cellStyle lad)
         []
 
 
@@ -88,12 +110,15 @@ cellStyle lad =
         Death ->
             deathStyle
 
+        None ->
+            deathStyle
+
 
 lifeStyle : List (Attribute Msg)
 lifeStyle =
     [ style "border" "1px solid #333"
-    , style "width" "5px"
-    , style "height" "5px"
+    , style "width" "10px"
+    , style "height" "10px"
     , style "background-color" "#333"
     ]
 
@@ -101,6 +126,6 @@ lifeStyle =
 deathStyle : List (Attribute Msg)
 deathStyle =
     [ style "border" "1px solid #333"
-    , style "width" "5px"
-    , style "height" "5px"
+    , style "width" "10px"
+    , style "height" "10px"
     ]
