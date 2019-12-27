@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import Array exposing (Array)
 import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -38,16 +39,16 @@ type LifeAndDeath
 
 
 type alias Model =
-    List (List LifeAndDeath)
+    Array (Array LifeAndDeath)
 
 
 init : Model
 init =
-    List.repeat rowNum <| List.repeat columnNum Death
+    Array.repeat rowNum <| Array.repeat columnNum Death
 
 
 type Msg
-    = Msg
+    = Click
 
 
 update : Msg -> Model -> Model
@@ -55,6 +56,7 @@ update msg model =
     model
 
 
+view : Model -> Html Msg
 view model =
     table []
         [ tbody [] (body model) ]
@@ -62,12 +64,12 @@ view model =
 
 body : Model -> List (Html Msg)
 body model =
-    List.map row model
+    Array.toList <| Array.map row model
 
 
-row : List LifeAndDeath -> Html Msg
+row : Array LifeAndDeath -> Html Msg
 row lads =
-    tr [] (List.map cell lads)
+    tr [] (Array.toList <| Array.map cell lads)
 
 
 cell : LifeAndDeath -> Html Msg
@@ -87,6 +89,7 @@ cellStyle lad =
             deathStyle
 
 
+lifeStyle : List (Attribute Msg)
 lifeStyle =
     [ style "border" "1px solid #333"
     , style "width" "5px"
@@ -95,6 +98,7 @@ lifeStyle =
     ]
 
 
+deathStyle : List (Attribute Msg)
 deathStyle =
     [ style "border" "1px solid #333"
     , style "width" "5px"
