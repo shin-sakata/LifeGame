@@ -3,9 +3,11 @@ module Main exposing (main)
 import Array exposing (Array)
 import Array.Extra as AE
 import Browser
+import Core exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
+import Random
 
 
 
@@ -14,15 +16,16 @@ import Html.Events exposing (onClick)
 
 size : Int
 size =
-    50
+    75
 
 
 main : Program () Model Msg
 main =
-    Browser.sandbox
+    Browser.element
         { init = init
         , update = update
         , view = view
+        , subscriptions = subscriptions
         }
 
 
@@ -30,58 +33,71 @@ main =
 -- Model
 
 
-type LifeAndDeath
-    = Life
-    | Death
-    | None
+init : () -> ( Model, Cmd Msg )
+init _ =
+    ( Array.initialize size <| always (Array.initialize size (always Death)), Cmd.none )
 
 
-flip : LifeAndDeath -> LifeAndDeath
-flip lad =
-    case lad of
-        Life ->
-            Death
 
-        Death ->
-            Life
-
-        None ->
-            None
-
-
-type alias Model =
-    Array (Array LifeAndDeath)
-
-
-type alias Point =
-    ( Int, Int )
-
-
-init : Model
-init =
-    Array.initialize size <| always (Array.initialize size (always Death))
+-- Update
 
 
 type Msg
     = Click Point
+    | NextGen
+    | CreateRandomModel
+    | RandomModel (List (List LifeAndDeath))
 
 
-click : Point -> Model -> Model
-click ( ri, ci ) model =
-    AE.update ri (AE.update ci flip) model
-
-
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Click p ->
-            click p model
+            ( flipPoint p model, Cmd.none )
+
+        NextGen ->
+            ( nextGen model, Cmd.none )
+
+        CreateRandomModel ->
+            ( model, Random.generate RandomModel randomModel )
+
+        RandomModel rModel ->
+            ( Array.fromList <| List.map Array.fromList rModel, Cmd.none )
+
+
+flipPoint : Point -> Model -> Model
+flipPoint ( ri, ci ) model =
+    AE.update ri (AE.update ci flip) model
+
+
+randomModel : Random.Generator (List (List LifeAndDeath))
+randomModel =
+    Random.list size <| Random.list size (Random.uniform Death [ Death, Death, Life ])
+
+
+
+-- SUBSCRIPTIONS
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    Sub.none
+
+
+
+-- View
 
 
 view : Model -> Html Msg
 view model =
-    table [ style "border-collapse" "collapse" ]
-        [ tbody [] (body model) ]
+    div []
+        [ table [ style "border-collapse" "collapse" ]
+            [ tbody [] (body model) ]
+        , button [ onClick NextGen ] [ text "Next Generation" ]
+        , button [ onClick CreateRandomModel ] [ text "Random" ]
+
+        -- , textarea [ onKeyPress KeyDown ] []
+        ]
 
 
 body : Model -> List (Html Msg)
@@ -117,8 +133,8 @@ cellStyle lad =
 lifeStyle : List (Attribute Msg)
 lifeStyle =
     [ style "border" "1px solid #333"
-    , style "width" "10px"
-    , style "height" "10px"
+    , style "width" "5px"
+    , style "height" "5px"
     , style "background-color" "#333"
     ]
 
@@ -126,6 +142,6 @@ lifeStyle =
 deathStyle : List (Attribute Msg)
 deathStyle =
     [ style "border" "1px solid #333"
-    , style "width" "10px"
-    , style "height" "10px"
+    , style "width" "5px"
+    , style "height" "5px"
     ]
