@@ -2,6 +2,12 @@
 
 # How to Play
 
+## Github Pages
+
+[LifeGame Github Pages](https://chemirea.github.io/LifeGame/)
+
+## Local
+
 ```
 $ git clone https://github.com/chemirea/LifeGame.git
 $ cd LifeGame
