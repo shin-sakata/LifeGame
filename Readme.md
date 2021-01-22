@@ -4,12 +4,12 @@
 
 ## Github Pages
 
-[LifeGame Github Pages](https://chemirea.github.io/LifeGame/)
+[LifeGame Github Pages](https://shin-sakata.github.io/LifeGame/)
 
 ## Local
 
 ```
-$ git clone https://github.com/chemirea/LifeGame.git
+$ git clone https://github.com/shin-sakata/LifeGame.git
 $ cd LifeGame
 $ npm install
 $ npx elm make src/Main.elm --optimize
