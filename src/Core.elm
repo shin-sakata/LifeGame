@@ -2,96 +2,83 @@ module Core exposing (..)
 
 import Array exposing (Array)
 import Array.Extra as AE
-import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
+import Matrics exposing (Matrics(..), Point)
+import Tuple exposing (pair)
 
 
-type LifeAndDeath
-    = Life
-    | Death
-    | None
+type CellularState
+    = Alive
+    | Dead
 
 
-type alias Point =
-    ( Int, Int )
+flip : CellularState -> CellularState
+flip cell =
+    case cell of
+        Alive ->
+            Dead
+
+        Dead ->
+            Alive
 
 
-type alias Model =
-    Array (Array LifeAndDeath)
-
-
-flip : LifeAndDeath -> LifeAndDeath
-flip lad =
-    case lad of
-        Life ->
-            Death
-
-        Death ->
-            Life
-
-        None ->
-            None
-
-
-nextGen : Model -> Model
-nextGen model =
+nextGen : Matrics CellularState -> Matrics CellularState
+nextGen matrics =
     let
-        zipCountMap : Array (Array ( Int, LifeAndDeath ))
+        zipCountMap : Matrics ( Int, CellularState )
         zipCountMap =
-            AE.map2 (\counts lads -> AE.zip counts lads) (aroundCountMap model) model
+            Matrics.map2 pair (countAround matrics) matrics
     in
-    Array.map (\maps -> Array.map nextGenPoint maps) zipCountMap
+    Matrics.map nextGenPoint zipCountMap
 
 
-nextGenPoint : ( Int, LifeAndDeath ) -> LifeAndDeath
+nextGenPoint : ( Int, CellularState ) -> CellularState
 nextGenPoint ( count, state ) =
     case state of
-        Life ->
+        Alive ->
             case count of
                 2 ->
-                    Life
+                    Alive
 
                 3 ->
-                    Life
+                    Alive
 
                 _ ->
-                    Death
+                    Dead
 
-        Death ->
+        Dead ->
             case count of
                 3 ->
-                    Life
+                    Alive
 
                 _ ->
-                    Death
-
-        None ->
-            None
+                    Dead
 
 
-aroundCountMap : Model -> Array (Array Int)
-aroundCountMap model =
-    Array.indexedMap
-        (\x row ->
-            Array.indexedMap
-                (\y _ -> countLife <| Array.map (getLifeAndDead model) (( x, y ) |> aroundPoint))
-                row
+countAround : Matrics CellularState -> Matrics Int
+countAround (Matrics matrics) =
+    Matrics
+        (Array.indexedMap
+            (\x row ->
+                Array.indexedMap
+                    (\y _ -> countLife <| Array.map (getCellularState (Matrics matrics)) (( x, y ) |> aroundPoint))
+                    row
+            )
+            matrics
         )
-        model
 
 
-countLife : Array LifeAndDeath -> Int
+countLife : Array CellularState -> Int
 countLife lads =
-    Array.length <| Array.filter ((==) Life) lads
+    Array.length <| Array.filter ((==) Alive) lads
 
 
-getLifeAndDead : Model -> Point -> LifeAndDeath
-getLifeAndDead model ( x, y ) =
-    case Array.get x model of
+getCellularState : Matrics CellularState -> Point -> CellularState
+getCellularState (Matrics matrics) ( x, y ) =
+    case Array.get x matrics of
         Nothing ->
-            Death
+            Dead
 
         Just row ->
             case Array.get y row of
@@ -99,7 +86,7 @@ getLifeAndDead model ( x, y ) =
                     v
 
                 Nothing ->
-                    None
+                    Dead
 
 
 aroundPoint : Point -> Array Point

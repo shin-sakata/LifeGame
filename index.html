@@ -5235,10 +5235,19 @@ var $elm$core$Task$perform = F2(
 			A2($elm$core$Task$map, toMessage, task));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Core$Death = 1;
+var $author$project$Core$Dead = 1;
 var $elm$core$Basics$always = F2(
 	function (a, _v0) {
 		return a;
+	});
+var $author$project$Matrics$Matrics = $elm$core$Basics$identity;
+var $author$project$Matrics$initialize = F2(
+	function (size, f) {
+		return A2(
+			$elm$core$Array$initialize,
+			size,
+			$elm$core$Basics$always(
+				A2($elm$core$Array$initialize, size, f)));
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5246,13 +5255,9 @@ var $author$project$Main$size = 75;
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
 		A2(
-			$elm$core$Array$initialize,
+			$author$project$Matrics$initialize,
 			$author$project$Main$size,
-			$elm$core$Basics$always(
-				A2(
-					$elm$core$Array$initialize,
-					$author$project$Main$size,
-					$elm$core$Basics$always(1)))),
+			$elm$core$Basics$always(1)),
 		$elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -5260,19 +5265,15 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (_v0) {
 	return $elm$core$Platform$Sub$none;
 };
-var $author$project$Main$RandomModel = function (a) {
+var $author$project$Main$Generated = function (a) {
 	return {$: 3, a: a};
 };
-var $author$project$Core$Life = 0;
-var $author$project$Core$None = 2;
-var $author$project$Core$flip = function (lad) {
-	switch (lad) {
-		case 0:
-			return 1;
-		case 1:
-			return 0;
-		default:
-			return 2;
+var $author$project$Core$Alive = 0;
+var $author$project$Core$flip = function (cell) {
+	if (!cell) {
+		return 1;
+	} else {
+		return 0;
 	}
 };
 var $elm$core$Bitwise$and = _Bitwise_and;
@@ -5374,51 +5375,21 @@ var $elm_community$array_extra$Array$Extra$update = F3(
 				a);
 		}
 	});
-var $author$project$Main$flipPoint = F2(
-	function (_v0, model) {
-		var ri = _v0.a;
-		var ci = _v0.b;
+var $author$project$Matrics$update = F3(
+	function (_v0, f, _v1) {
+		var r = _v0.a;
+		var c = _v0.b;
+		var matrics = _v1;
 		return A3(
 			$elm_community$array_extra$Array$Extra$update,
-			ri,
-			A2($elm_community$array_extra$Array$Extra$update, ci, $author$project$Core$flip),
-			model);
+			r,
+			A2($elm_community$array_extra$Array$Extra$update, c, f),
+			matrics);
 	});
-var $elm$core$Array$fromListHelp = F3(
-	function (list, nodeList, nodeListSize) {
-		fromListHelp:
-		while (true) {
-			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
-			var jsArray = _v0.a;
-			var remainingItems = _v0.b;
-			if (_Utils_cmp(
-				$elm$core$Elm$JsArray$length(jsArray),
-				$elm$core$Array$branchFactor) < 0) {
-				return A2(
-					$elm$core$Array$builderToArray,
-					true,
-					{d: nodeList, a: nodeListSize, c: jsArray});
-			} else {
-				var $temp$list = remainingItems,
-					$temp$nodeList = A2(
-					$elm$core$List$cons,
-					$elm$core$Array$Leaf(jsArray),
-					nodeList),
-					$temp$nodeListSize = nodeListSize + 1;
-				list = $temp$list;
-				nodeList = $temp$nodeList;
-				nodeListSize = $temp$nodeListSize;
-				continue fromListHelp;
-			}
-		}
+var $author$project$Main$flipPoint = F2(
+	function (point, matrics) {
+		return A3($author$project$Matrics$update, point, $author$project$Core$flip, matrics);
 	});
-var $elm$core$Array$fromList = function (list) {
-	if (!list.b) {
-		return $elm$core$Array$empty;
-	} else {
-		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
-	}
-};
 var $elm$random$Random$Generate = $elm$core$Basics$identity;
 var $elm$random$Random$Seed = F2(
 	function (a, b) {
@@ -5516,6 +5487,41 @@ var $elm$random$Random$generate = F2(
 		return $elm$random$Random$command(
 			A2($elm$random$Random$map, tagger, generator));
 	});
+var $elm$core$Array$fromListHelp = F3(
+	function (list, nodeList, nodeListSize) {
+		fromListHelp:
+		while (true) {
+			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
+			var jsArray = _v0.a;
+			var remainingItems = _v0.b;
+			if (_Utils_cmp(
+				$elm$core$Elm$JsArray$length(jsArray),
+				$elm$core$Array$branchFactor) < 0) {
+				return A2(
+					$elm$core$Array$builderToArray,
+					true,
+					{d: nodeList, a: nodeListSize, c: jsArray});
+			} else {
+				var $temp$list = remainingItems,
+					$temp$nodeList = A2(
+					$elm$core$List$cons,
+					$elm$core$Array$Leaf(jsArray),
+					nodeList),
+					$temp$nodeListSize = nodeListSize + 1;
+				list = $temp$list;
+				nodeList = $temp$nodeList;
+				nodeListSize = $temp$nodeListSize;
+				continue fromListHelp;
+			}
+		}
+	});
+var $elm$core$Array$fromList = function (list) {
+	if (!list.b) {
+		return $elm$core$Array$empty;
+	} else {
+		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
+	}
+};
 var $author$project$Core$aroundPoint = function (_v0) {
 	var x = _v0.a;
 	var y = _v0.b;
@@ -5555,21 +5561,22 @@ var $author$project$Core$countLife = function (lads) {
 			$elm$core$Basics$eq(0),
 			lads));
 };
-var $author$project$Core$getLifeAndDead = F2(
-	function (model, _v0) {
-		var x = _v0.a;
-		var y = _v0.b;
-		var _v1 = A2($elm$core$Array$get, x, model);
-		if (_v1.$ === 1) {
+var $author$project$Core$getCellularState = F2(
+	function (_v0, _v1) {
+		var matrics = _v0;
+		var x = _v1.a;
+		var y = _v1.b;
+		var _v2 = A2($elm$core$Array$get, x, matrics);
+		if (_v2.$ === 1) {
 			return 1;
 		} else {
-			var row = _v1.a;
-			var _v2 = A2($elm$core$Array$get, y, row);
-			if (!_v2.$) {
-				var v = _v2.a;
+			var row = _v2.a;
+			var _v3 = A2($elm$core$Array$get, y, row);
+			if (!_v3.$) {
+				var v = _v3.a;
 				return v;
 			} else {
-				return 2;
+				return 1;
 			}
 		}
 	});
@@ -5636,7 +5643,8 @@ var $elm$core$Array$map = F2(
 			A2($elm$core$Elm$JsArray$map, helper, tree),
 			A2($elm$core$Elm$JsArray$map, func, tail));
 	});
-var $author$project$Core$aroundCountMap = function (model) {
+var $author$project$Core$countAround = function (_v0) {
+	var matrics = _v0;
 	return A2(
 		$elm$core$Array$indexedMap,
 		F2(
@@ -5644,18 +5652,31 @@ var $author$project$Core$aroundCountMap = function (model) {
 				return A2(
 					$elm$core$Array$indexedMap,
 					F2(
-						function (y, _v0) {
+						function (y, _v1) {
 							return $author$project$Core$countLife(
 								A2(
 									$elm$core$Array$map,
-									$author$project$Core$getLifeAndDead(model),
+									$author$project$Core$getCellularState(matrics),
 									$author$project$Core$aroundPoint(
 										_Utils_Tuple2(x, y))));
 						}),
 					row);
 			}),
-		model);
+		matrics);
 };
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var $author$project$Matrics$map = F2(
+	function (f, _v0) {
+		var matrics = _v0;
+		return A2(
+			A2($elm$core$Basics$composeR, $elm$core$Array$map, $elm$core$Array$map),
+			f,
+			matrics);
+	});
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
 		var _v0 = f(mx);
@@ -5939,49 +5960,47 @@ var $elm_community$array_extra$Array$Extra$map2 = F2(
 		return $elm_community$array_extra$Array$Extra$apply(
 			A2($elm$core$Array$map, f, ws));
 	});
+var $author$project$Matrics$map2 = F3(
+	function (f, _v0, _v1) {
+		var m1 = _v0;
+		var m2 = _v1;
+		return A3(
+			A2($elm$core$Basics$composeR, $elm_community$array_extra$Array$Extra$map2, $elm_community$array_extra$Array$Extra$map2),
+			f,
+			m1,
+			m2);
+	});
 var $author$project$Core$nextGenPoint = function (_v0) {
 	var count = _v0.a;
 	var state = _v0.b;
-	switch (state) {
-		case 0:
-			switch (count) {
-				case 2:
-					return 0;
-				case 3:
-					return 0;
-				default:
-					return 1;
-			}
-		case 1:
-			if (count === 3) {
+	if (!state) {
+		switch (count) {
+			case 2:
 				return 0;
-			} else {
+			case 3:
+				return 0;
+			default:
 				return 1;
-			}
-		default:
-			return 2;
+		}
+	} else {
+		if (count === 3) {
+			return 0;
+		} else {
+			return 1;
+		}
 	}
 };
 var $elm$core$Tuple$pair = F2(
 	function (a, b) {
 		return _Utils_Tuple2(a, b);
 	});
-var $elm_community$array_extra$Array$Extra$zip = $elm_community$array_extra$Array$Extra$map2($elm$core$Tuple$pair);
-var $author$project$Core$nextGen = function (model) {
+var $author$project$Core$nextGen = function (matrics) {
 	var zipCountMap = A3(
-		$elm_community$array_extra$Array$Extra$map2,
-		F2(
-			function (counts, lads) {
-				return A2($elm_community$array_extra$Array$Extra$zip, counts, lads);
-			}),
-		$author$project$Core$aroundCountMap(model),
-		model);
-	return A2(
-		$elm$core$Array$map,
-		function (maps) {
-			return A2($elm$core$Array$map, $author$project$Core$nextGenPoint, maps);
-		},
-		zipCountMap);
+		$author$project$Matrics$map2,
+		$elm$core$Tuple$pair,
+		$author$project$Core$countAround(matrics),
+		matrics);
+	return A2($author$project$Matrics$map, $author$project$Core$nextGenPoint, zipCountMap);
 };
 var $elm$random$Random$listHelp = F4(
 	function (revList, n, gen, seed) {
@@ -6012,6 +6031,7 @@ var $elm$random$Random$list = F2(
 			return A4($elm$random$Random$listHelp, _List_Nil, n, gen, seed);
 		};
 	});
+var $author$project$Matrics$pure = $elm$core$Basics$identity;
 var $elm$random$Random$addOne = function (value) {
 	return _Utils_Tuple2(1, value);
 };
@@ -6093,17 +6113,26 @@ var $elm$random$Random$uniform = F2(
 			$elm$random$Random$addOne(value),
 			A2($elm$core$List$map, $elm$random$Random$addOne, valueList));
 	});
-var $author$project$Main$randomModel = A2(
-	$elm$random$Random$list,
-	$author$project$Main$size,
+var $author$project$Main$randomCellularStateMatrics = A2(
+	$elm$random$Random$map,
+	$author$project$Matrics$pure,
 	A2(
-		$elm$random$Random$list,
-		$author$project$Main$size,
+		$elm$random$Random$map,
+		$elm$core$Array$fromList,
 		A2(
-			$elm$random$Random$uniform,
-			1,
-			_List_fromArray(
-				[1, 1, 0]))));
+			$elm$random$Random$list,
+			$author$project$Main$size,
+			A2(
+				$elm$random$Random$map,
+				$elm$core$Array$fromList,
+				A2(
+					$elm$random$Random$list,
+					$author$project$Main$size,
+					A2(
+						$elm$random$Random$uniform,
+						1,
+						_List_fromArray(
+							[1, 1, 0])))))));
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -6119,13 +6148,10 @@ var $author$project$Main$update = F2(
 			case 2:
 				return _Utils_Tuple2(
 					model,
-					A2($elm$random$Random$generate, $author$project$Main$RandomModel, $author$project$Main$randomModel));
+					A2($elm$random$Random$generate, $author$project$Main$Generated, $author$project$Main$randomCellularStateMatrics));
 			default:
-				var rModel = msg.a;
-				return _Utils_Tuple2(
-					$elm$core$Array$fromList(
-						A2($elm$core$List$map, $elm$core$Array$fromList, rModel)),
-					$elm$core$Platform$Cmd$none);
+				var matrics = msg.a;
+				return _Utils_Tuple2(matrics, $elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Main$CreateRandomModel = {$: 2};
@@ -6135,27 +6161,24 @@ var $author$project$Main$Click = function (a) {
 };
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $author$project$Main$deathStyle = _List_fromArray(
-	[
-		A2($elm$html$Html$Attributes$style, 'border', '1px solid #333'),
-		A2($elm$html$Html$Attributes$style, 'width', '5px'),
-		A2($elm$html$Html$Attributes$style, 'height', '5px')
-	]);
-var $author$project$Main$lifeStyle = _List_fromArray(
+var $author$project$Main$aliveStyle = _List_fromArray(
 	[
 		A2($elm$html$Html$Attributes$style, 'border', '1px solid #333'),
 		A2($elm$html$Html$Attributes$style, 'width', '5px'),
 		A2($elm$html$Html$Attributes$style, 'height', '5px'),
 		A2($elm$html$Html$Attributes$style, 'background-color', '#333')
 	]);
+var $author$project$Main$deadStyle = _List_fromArray(
+	[
+		A2($elm$html$Html$Attributes$style, 'border', '1px solid #333'),
+		A2($elm$html$Html$Attributes$style, 'width', '5px'),
+		A2($elm$html$Html$Attributes$style, 'height', '5px')
+	]);
 var $author$project$Main$cellStyle = function (lad) {
-	switch (lad) {
-		case 0:
-			return $author$project$Main$lifeStyle;
-		case 1:
-			return $author$project$Main$deathStyle;
-		default:
-			return $author$project$Main$deathStyle;
+	if (lad === 1) {
+		return $author$project$Main$deadStyle;
+	} else {
+		return $author$project$Main$aliveStyle;
 	}
 };
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
@@ -6200,9 +6223,10 @@ var $author$project$Main$row = F2(
 					$author$project$Main$cell(rindex),
 					lads)));
 	});
-var $author$project$Main$body = function (model) {
+var $author$project$Main$body = function (_v0) {
+	var matrics = _v0;
 	return $elm$core$Array$toList(
-		A2($elm$core$Array$indexedMap, $author$project$Main$row, model));
+		A2($elm$core$Array$indexedMap, $author$project$Main$row, matrics));
 };
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$div = _VirtualDom_node('div');

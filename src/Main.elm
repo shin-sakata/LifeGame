@@ -1,12 +1,12 @@
 module Main exposing (main)
 
 import Array exposing (Array)
-import Array.Extra as AE
 import Browser
 import Core exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
+import Matrics exposing (Matrics(..), Point)
 import Random
 
 
@@ -33,9 +33,13 @@ main =
 -- Model
 
 
+type alias Model =
+    Matrics CellularState
+
+
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Array.initialize size <| always (Array.initialize size (always Death)), Cmd.none )
+    ( Matrics.initialize size (always Dead), Cmd.none )
 
 
 
@@ -46,7 +50,7 @@ type Msg
     = Click Point
     | NextGen
     | CreateRandomModel
-    | RandomModel (List (List LifeAndDeath))
+    | Generated (Matrics CellularState)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -59,20 +63,25 @@ update msg model =
             ( nextGen model, Cmd.none )
 
         CreateRandomModel ->
-            ( model, Random.generate RandomModel randomModel )
+            ( model, Random.generate Generated randomCellularStateMatrics )
 
-        RandomModel rModel ->
-            ( Array.fromList <| List.map Array.fromList rModel, Cmd.none )
-
-
-flipPoint : Point -> Model -> Model
-flipPoint ( ri, ci ) model =
-    AE.update ri (AE.update ci flip) model
+        Generated matrics ->
+            ( matrics, Cmd.none )
 
 
-randomModel : Random.Generator (List (List LifeAndDeath))
-randomModel =
-    Random.list size <| Random.list size (Random.uniform Death [ Death, Death, Life ])
+flipPoint : Point -> Matrics CellularState -> Matrics CellularState
+flipPoint point matrics =
+    Matrics.update point flip matrics
+
+
+randomCellularStateMatrics : Random.Generator (Matrics CellularState)
+randomCellularStateMatrics =
+    Random.uniform Dead [ Dead, Dead, Alive ]
+        |> Random.list size
+        |> Random.map Array.fromList
+        |> Random.list size
+        |> Random.map Array.fromList
+        |> Random.map Matrics.pure
 
 
 
@@ -100,38 +109,35 @@ view model =
         ]
 
 
-body : Model -> List (Html Msg)
-body model =
-    Array.toList <| Array.indexedMap row model
+body : Matrics CellularState -> List (Html Msg)
+body (Matrics matrics) =
+    Array.toList <| Array.indexedMap row matrics
 
 
-row : Int -> Array LifeAndDeath -> Html Msg
+row : Int -> Array CellularState -> Html Msg
 row rindex lads =
     tr [] (Array.toList <| Array.indexedMap (cell rindex) lads)
 
 
-cell : Int -> Int -> LifeAndDeath -> Html Msg
+cell : Int -> Int -> CellularState -> Html Msg
 cell rindex cindex lad =
     td
         (onClick (Click ( rindex, cindex )) :: cellStyle lad)
         []
 
 
-cellStyle : LifeAndDeath -> List (Attribute Msg)
+cellStyle : CellularState -> List (Attribute Msg)
 cellStyle lad =
     case lad of
-        Life ->
-            lifeStyle
+        Dead ->
+            deadStyle
 
-        Death ->
-            deathStyle
-
-        None ->
-            deathStyle
+        Alive ->
+            aliveStyle
 
 
-lifeStyle : List (Attribute Msg)
-lifeStyle =
+aliveStyle : List (Attribute Msg)
+aliveStyle =
     [ style "border" "1px solid #333"
     , style "width" "5px"
     , style "height" "5px"
@@ -139,8 +145,8 @@ lifeStyle =
     ]
 
 
-deathStyle : List (Attribute Msg)
-deathStyle =
+deadStyle : List (Attribute Msg)
+deadStyle =
     [ style "border" "1px solid #333"
     , style "width" "5px"
     , style "height" "5px"
