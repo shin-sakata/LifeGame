@@ -36,6 +36,19 @@ map2 f (Matrics m1) (Matrics m2) =
     Matrics ((AE.map2 >> AE.map2) f m1 m2)
 
 
+indexedMap : (Point -> a -> b) -> Matrics a -> Matrics b
+indexedMap f (Matrics matrics) =
+    Matrics
+        (Array.indexedMap
+            (\ri arr ->
+                Array.indexedMap
+                    (\ci a -> f ( ri, ci ) a)
+                    arr
+            )
+            matrics
+        )
+
+
 update : Point -> (a -> a) -> Matrics a -> Matrics a
 update ( r, c ) f (Matrics matrics) =
     Matrics (AE.update r (AE.update c f) matrics)

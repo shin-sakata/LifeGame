@@ -56,16 +56,14 @@ nextGenPoint ( count, state ) =
 
 
 countAround : Matrics CellularState -> Matrics Int
-countAround (Matrics matrics) =
-    Matrics
-        (Array.indexedMap
-            (\x row ->
-                Array.indexedMap
-                    (\y _ -> countLife <| Array.map (getCellularState (Matrics matrics)) (( x, y ) |> aroundPoint))
-                    row
-            )
-            matrics
+countAround matrics =
+    Matrics.indexedMap
+        (aroundPoint
+            >> Array.map (getCellularState matrics)
+            >> countLife
+            >> always
         )
+        matrics
 
 
 countLife : Array CellularState -> Int

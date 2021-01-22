@@ -16,7 +16,7 @@ import Random
 
 size : Int
 size =
-    75
+    100
 
 
 main : Program () Model Msg
@@ -39,7 +39,12 @@ type alias Model =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Matrics.initialize size (always Dead), Cmd.none )
+    ( allDead, Cmd.none )
+
+
+allDead : Matrics CellularState
+allDead =
+    Matrics.initialize size (always Dead)
 
 
 
@@ -51,6 +56,7 @@ type Msg
     | NextGen
     | CreateRandomModel
     | Generated (Matrics CellularState)
+    | Clear
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -67,6 +73,9 @@ update msg model =
 
         Generated matrics ->
             ( matrics, Cmd.none )
+
+        Clear ->
+            ( allDead, Cmd.none )
 
 
 flipPoint : Point -> Matrics CellularState -> Matrics CellularState
@@ -104,8 +113,7 @@ view model =
             [ tbody [] (body model) ]
         , button [ onClick NextGen ] [ text "Next Generation" ]
         , button [ onClick CreateRandomModel ] [ text "Random" ]
-
-        -- , textarea [ onKeyPress KeyDown ] []
+        , button [ onClick Clear ] [ text "Clear" ]
         ]
 
 
@@ -138,16 +146,18 @@ cellStyle lad =
 
 aliveStyle : List (Attribute Msg)
 aliveStyle =
-    [ style "border" "1px solid #333"
-    , style "width" "5px"
-    , style "height" "5px"
-    , style "background-color" "#333"
-    ]
+    baseCellStyle [ style "background-color" "lightgreen" ]
 
 
 deadStyle : List (Attribute Msg)
 deadStyle =
-    [ style "border" "1px solid #333"
-    , style "width" "5px"
-    , style "height" "5px"
+    baseCellStyle [ style "background-color" "gray" ]
+
+
+baseCellStyle : List (Attribute msg) -> List (Attribute msg)
+baseCellStyle attr =
+    [ style "border" "1px solid gray"
+    , style "width" "6px"
+    , style "height" "6px"
     ]
+        ++ attr

@@ -5249,16 +5249,15 @@ var $author$project$Matrics$initialize = F2(
 			$elm$core$Basics$always(
 				A2($elm$core$Array$initialize, size, f)));
 	});
+var $author$project$Main$size = 100;
+var $author$project$Main$allDead = A2(
+	$author$project$Matrics$initialize,
+	$author$project$Main$size,
+	$elm$core$Basics$always(1));
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Main$size = 75;
 var $author$project$Main$init = function (_v0) {
-	return _Utils_Tuple2(
-		A2(
-			$author$project$Matrics$initialize,
-			$author$project$Main$size,
-			$elm$core$Basics$always(1)),
-		$elm$core$Platform$Cmd$none);
+	return _Utils_Tuple2($author$project$Main$allDead, $elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
@@ -5538,6 +5537,11 @@ var $author$project$Core$aroundPoint = function (_v0) {
 				_Utils_Tuple2(x + 1, y + 1)
 			]));
 };
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
 var $elm$core$Array$filter = F2(
 	function (isGood, array) {
 		return $elm$core$Array$fromList(
@@ -5618,6 +5622,26 @@ var $elm$core$Array$indexedMap = F2(
 			true,
 			A3($elm$core$Elm$JsArray$foldl, helper, initialBuilder, tree));
 	});
+var $author$project$Matrics$indexedMap = F2(
+	function (f, _v0) {
+		var matrics = _v0;
+		return A2(
+			$elm$core$Array$indexedMap,
+			F2(
+				function (ri, arr) {
+					return A2(
+						$elm$core$Array$indexedMap,
+						F2(
+							function (ci, a) {
+								return A2(
+									f,
+									_Utils_Tuple2(ri, ci),
+									a);
+							}),
+						arr);
+				}),
+			matrics);
+	});
 var $elm$core$Elm$JsArray$map = _JsArray_map;
 var $elm$core$Array$map = F2(
 	function (func, _v0) {
@@ -5643,32 +5667,19 @@ var $elm$core$Array$map = F2(
 			A2($elm$core$Elm$JsArray$map, helper, tree),
 			A2($elm$core$Elm$JsArray$map, func, tail));
 	});
-var $author$project$Core$countAround = function (_v0) {
-	var matrics = _v0;
+var $author$project$Core$countAround = function (matrics) {
 	return A2(
-		$elm$core$Array$indexedMap,
-		F2(
-			function (x, row) {
-				return A2(
-					$elm$core$Array$indexedMap,
-					F2(
-						function (y, _v1) {
-							return $author$project$Core$countLife(
-								A2(
-									$elm$core$Array$map,
-									$author$project$Core$getCellularState(matrics),
-									$author$project$Core$aroundPoint(
-										_Utils_Tuple2(x, y))));
-						}),
-					row);
-			}),
+		$author$project$Matrics$indexedMap,
+		A2(
+			$elm$core$Basics$composeR,
+			$author$project$Core$aroundPoint,
+			A2(
+				$elm$core$Basics$composeR,
+				$elm$core$Array$map(
+					$author$project$Core$getCellularState(matrics)),
+				A2($elm$core$Basics$composeR, $author$project$Core$countLife, $elm$core$Basics$always))),
 		matrics);
 };
-var $elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
 var $author$project$Matrics$map = F2(
 	function (f, _v0) {
 		var matrics = _v0;
@@ -6149,11 +6160,14 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					model,
 					A2($elm$random$Random$generate, $author$project$Main$Generated, $author$project$Main$randomCellularStateMatrics));
-			default:
+			case 3:
 				var matrics = msg.a;
 				return _Utils_Tuple2(matrics, $elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2($author$project$Main$allDead, $elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Main$Clear = {$: 4};
 var $author$project$Main$CreateRandomModel = {$: 2};
 var $author$project$Main$NextGen = {$: 1};
 var $author$project$Main$Click = function (a) {
@@ -6161,19 +6175,26 @@ var $author$project$Main$Click = function (a) {
 };
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $author$project$Main$aliveStyle = _List_fromArray(
-	[
-		A2($elm$html$Html$Attributes$style, 'border', '1px solid #333'),
-		A2($elm$html$Html$Attributes$style, 'width', '5px'),
-		A2($elm$html$Html$Attributes$style, 'height', '5px'),
-		A2($elm$html$Html$Attributes$style, 'background-color', '#333')
-	]);
-var $author$project$Main$deadStyle = _List_fromArray(
-	[
-		A2($elm$html$Html$Attributes$style, 'border', '1px solid #333'),
-		A2($elm$html$Html$Attributes$style, 'width', '5px'),
-		A2($elm$html$Html$Attributes$style, 'height', '5px')
-	]);
+var $author$project$Main$baseCellStyle = function (attr) {
+	return _Utils_ap(
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'border', '1px solid gray'),
+				A2($elm$html$Html$Attributes$style, 'width', '6px'),
+				A2($elm$html$Html$Attributes$style, 'height', '6px')
+			]),
+		attr);
+};
+var $author$project$Main$aliveStyle = $author$project$Main$baseCellStyle(
+	_List_fromArray(
+		[
+			A2($elm$html$Html$Attributes$style, 'background-color', 'lightgreen')
+		]));
+var $author$project$Main$deadStyle = $author$project$Main$baseCellStyle(
+	_List_fromArray(
+		[
+			A2($elm$html$Html$Attributes$style, 'background-color', 'gray')
+		]));
 var $author$project$Main$cellStyle = function (lad) {
 	if (lad === 1) {
 		return $author$project$Main$deadStyle;
@@ -6272,6 +6293,16 @@ var $author$project$Main$view = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text('Random')
+					])),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$Main$Clear)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Clear')
 					]))
 			]));
 };
