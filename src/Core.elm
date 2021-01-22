@@ -1,7 +1,6 @@
 module Core exposing (..)
 
 import Array exposing (Array)
-import Array.Extra as AE
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Matrics exposing (Matrics(..), Point)
